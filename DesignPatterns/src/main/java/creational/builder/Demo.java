@@ -4,6 +4,7 @@ import creational.builder.builders.CarBuilder;
 import creational.builder.builders.CarManualBuilder;
 import creational.builder.cars.Car;
 import creational.builder.cars.Manual;
+import creational.builder.components.Engine;
 import creational.builder.director.Director;
 
 public class Demo {
@@ -24,10 +25,12 @@ public class Demo {
         System.out.println("Car built:\n" + car.print());
 
 
+
+
         CarManualBuilder manualBuilder = new CarManualBuilder();
 
         // Director may know several building recipes.
-        director.constructSUV(manualBuilder);
+        director.constructSportsCar(manualBuilder);
         Manual carManual = manualBuilder.getResult();
         System.out.println("\nCar manual built:\n" + carManual.print());
     }

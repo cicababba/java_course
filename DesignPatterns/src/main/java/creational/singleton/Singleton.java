@@ -14,7 +14,7 @@ public class Singleton {
         return instance;
     }
 
-    //todo altri metodi e variabili che devono essere condivisi glboablmente in una singola istanza
+    //todo altri metodi e variabili che devono essere condivisi globalmente in una singola istanza
 
 
     public static void main(String[] args) {

@@ -12,7 +12,7 @@ public class Demo {
 
         MovableAdapter bugattiVeyronAdapter = new MovableAdapterImpl(bugattiVeyron);
 
-        System.out.println(bugattiVeyronAdapter.getSpeed());
-        System.out.println(bugattiVeyron.getSpeed());
+        System.out.println(bugattiVeyronAdapter.getSpeed());// KM/H
+        System.out.println(bugattiVeyron.getSpeed());// MPH
     }
 }
