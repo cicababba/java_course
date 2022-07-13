@@ -31,15 +31,14 @@ public class UserService {
     }
 
     public UserDTO findByEmail(String email) throws Exception {
-        Optional<User> dbUser = userRepository.findByEmail(email);
-        if (dbUser.isEmpty()) {
-            throw new Exception("User with email " + email + " does not exist");
-        }
+        User dbUser = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User with email " + email + " not found"));
+
         UserDTO userDto = new UserDTO();
-        userDto.setName(dbUser.get().getName());
-        userDto.setSurname(dbUser.get().getSurname());
-        userDto.setEmail(dbUser.get().getEmail());
-        userDto.setPassword(dbUser.get().getPassword());
+        userDto.setName(dbUser.getName());
+        userDto.setSurname(dbUser.getSurname());
+        userDto.setEmail(dbUser.getEmail());
+        userDto.setPassword(dbUser.getPassword());
+        userDto.setBalance(dbUser.getBalance());
         return userDto;
     }
 
@@ -49,6 +48,7 @@ public class UserService {
         user.setSurname(userDto.getSurname());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
+        user.setBalance(userDto.getBalance());
         userRepository.save(user);
     }
 
@@ -62,5 +62,12 @@ public class UserService {
 
     public boolean exists(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    public void updateBalance(String email, double amount) throws Exception {
+        User dbUser = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
+
+        dbUser.setBalance(dbUser.getBalance() + amount);
+        userRepository.save(dbUser);
     }
 }

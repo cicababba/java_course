@@ -12,4 +12,6 @@ public class UserDTO {
     private String email;
 
     private String password;
+
+    private double balance;
 }

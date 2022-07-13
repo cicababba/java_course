@@ -12,6 +12,7 @@ import q.bit.qcommerce.repository.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CartService {
@@ -29,20 +30,51 @@ public class CartService {
         return cartRepository.findAll();
     }
 
-    public Cart createCart(String email, List<ProductDTO> products) throws Exception {
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isEmpty()) {
-            throw new Exception("User with email " + email + " does not exist");
-        }
 
-        List<Product> productList = productRepository.findAll();
+    public Cart createCart(String email, List<ProductDTO> products) throws Exception {
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
+
+
+        List<Product> productList = productRepository.findAllById(products.stream().map(ProductDTO::getId).collect(Collectors.toList()));
         double total = productList.stream().mapToDouble(Product::getPrice).sum();
 
         Cart cart = new Cart();
-        cart.setUser(user.get());
+        cart.setUser(user);
         cart.setProducts(productList);
         cart.setTotal(total);
 
         return cartRepository.save(cart);
     }
+
+
+    public List<Cart> findAllByUser(String email) throws Exception {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
+        return cartRepository.findAllByUser(user);
+    }
+
+    public void pay(long cartId, String email) throws Exception {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
+
+        Cart cart = cartRepository.findById(cartId).orElseThrow(() -> new Exception("Cart with id " + cartId + " does not exist"));
+
+        if(!cart.getUser().getEmail().equals(user.getEmail()))
+            throw new Exception("User with email " + email + " does not own this cart");
+
+        if (cart.getTotal() > user.getBalance())
+            throw new Exception("User with email " + email + " does not have enough money");
+
+        user.setBalance(user.getBalance() - cart.getTotal());
+        userRepository.save(user);
+        cart.setCompleted(true);
+        cartRepository.save(cart);
+    }
+
+    public List<Cart> findAllByUserAndCompleted(String email, boolean completed) throws Exception {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
+        cartRepository.findAllByUserAndCompleted(user, completed);
+        return cartRepository.findAllByUserAndCompleted(user, completed);
+    }
+
 }

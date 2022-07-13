@@ -84,4 +84,14 @@ public class UserController {
         }
     }
 
+
+    @PutMapping("/{email}/recharge/{amount}")
+    public Response updateBalance(@PathVariable String email, @PathVariable double amount) {
+        try {
+            userService.updateBalance(email, amount);
+            return buildResponse("Amount updated", 200, null);
+        } catch (Exception e) {
+            return buildResponse(e.getMessage(), 500, null);
+        }
+    }
 }

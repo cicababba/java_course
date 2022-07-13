@@ -1,11 +1,13 @@
 package q.bit.qcommerce.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import q.bit.qcommerce.dto.ProductDTO;
 import q.bit.qcommerce.dto.Response;
 import q.bit.qcommerce.model.Product;
 import q.bit.qcommerce.repository.ProductRepository;
+import q.bit.qcommerce.service.ProductService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +22,9 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private ProductService productService;
+
     @GetMapping
     public Response getAllProducts() {
         List<Product> products = productRepository.findAll();
@@ -33,6 +38,17 @@ public class ProductController {
             productDTOs.add(productDTO);
         });
         return buildResponse("Success", 200, productDTOs);
+    }
+
+    @GetMapping("/{page}/{size}")
+    public Response getAllProductsPaginated(@PathVariable int page, @PathVariable int size) {
+        try {
+            Page<Product> products = productService.findAllPaginated(page, size);
+
+            return buildResponse("Success", 200, products);
+        } catch (Exception e) {
+            return buildResponse(e.getMessage(), 500, null);
+        }
     }
 
     @GetMapping("/{id}")
