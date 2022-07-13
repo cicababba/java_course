@@ -59,4 +59,8 @@ public class UserService {
         }
         userRepository.delete(dbUser.get());
     }
+
+    public boolean exists(String email) {
+        return userRepository.existsByEmail(email);
+    }
 }

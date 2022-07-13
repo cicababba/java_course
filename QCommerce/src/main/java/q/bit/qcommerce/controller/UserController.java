@@ -49,10 +49,12 @@ public class UserController {
     @PostMapping
     public Response createUser(@RequestBody UserDTO user) {
         try {
-            if (user.getEmail().isBlank() || user.getPassword().isBlank()) {
+            if (user.getEmail().isBlank() || user.getPassword().isBlank())
                 return buildResponse("Email and password are required", 400, null);
-            }
-            userService.findByEmail(user.getEmail());
+
+            if(userService.exists(user.getEmail()))
+                return buildResponse("User with email " + user.getEmail() + " already exists", 400, null);
+
             userService.save(user);
             return buildResponse("Success", 200, null);
         } catch (Exception e) {
@@ -65,7 +67,7 @@ public class UserController {
         try {
             userService.findByEmail(user.getEmail());
             userService.save(user);
-            return buildResponse("Success", 200, null);
+            return buildResponse("Success", 200, user);
         } catch (Exception e) {
             return buildResponse(e.getMessage(), 500, null);
         }

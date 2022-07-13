@@ -1,5 +1,6 @@
 package q.bit.qcommerce.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,6 +24,9 @@ public class User {
 
     private String password;
 
+    private double balance;
+
+    @JsonIgnore
     @OneToMany(mappedBy = "user")
     private List<Cart> carts;//orders
 }
