@@ -1,13 +1,14 @@
 package q.bit.qcommerce.service;
 
 import org.apache.log4j.Logger;
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import q.bit.qcommerce.dto.LiteUserDTO;
 import q.bit.qcommerce.dto.UserDTO;
 import q.bit.qcommerce.model.User;
 import q.bit.qcommerce.repository.UserRepository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,33 +20,27 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+   @Autowired
+   private MapperService mapper;
+
 
     public List<UserDTO> findAll() {
         List<User> users = userRepository.findAll();
-        List<UserDTO> userDTOs = new ArrayList<>();
         log.debug("searching for all users");
-        users.forEach(user -> {
-            UserDTO userDTO = new UserDTO();
-            userDTO.setName(user.getName());
-            userDTO.setSurname(user.getSurname());
-            userDTO.setEmail(user.getEmail());
-            userDTO.setPassword(user.getPassword());
-            userDTOs.add(userDTO);
-        });
-        return userDTOs;
+
+        return mapper.getMapper().map(users, new TypeToken<List<UserDTO>>(){}.getType());
     }
 
     public UserDTO findByEmail(String email) throws Exception {
         User dbUser = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User with email " + email + " not found"));
 
-        UserDTO userDto = new UserDTO();
-        userDto.setName(dbUser.getName());
-        userDto.setSurname(dbUser.getSurname());
-        userDto.setEmail(dbUser.getEmail());
-        userDto.setPassword(dbUser.getPassword());
-        userDto.setBalance(dbUser.getBalance());
-        return userDto;
+        return mapper.getMapper().map(dbUser, UserDTO.class);
     }
+    public LiteUserDTO findLiteByEmail(String email) throws Exception {
+        User dbUser = userRepository.findByEmail(email).orElseThrow(() -> new Exception("User with email " + email + " not found"));
+        return mapper.getMapper().map(dbUser, LiteUserDTO.class);
+    }
+
 
     public void save(UserDTO userDto) {
         User user = new User();

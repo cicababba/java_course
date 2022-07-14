@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import q.bit.qcommerce.dto.LiteUserDTO;
 import q.bit.qcommerce.dto.Response;
 import q.bit.qcommerce.dto.UserDTO;
 import q.bit.qcommerce.service.UserService;
@@ -49,6 +50,18 @@ public class UserController {
            log.info("getByEmail -> exception", e);
            return buildResponse(e.getMessage(), 500, null);
        }
+    }
+
+    @GetMapping("/{email}/lite")
+    public Response getLiteByEmail(@PathVariable String email) {
+        try {
+            LiteUserDTO userDto = userService.findLiteByEmail(email);
+            log.info("getByEmail -> user found " + userDto);
+            return buildResponse("Success", 200, userDto);
+        } catch (Exception e) {
+            log.info("getByEmail -> exception", e);
+            return buildResponse(e.getMessage(), 500, null);
+        }
     }
 
     @PostMapping

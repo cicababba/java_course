@@ -1,8 +1,10 @@
 package q.bit.qcommerce.service;
 
+import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import q.bit.qcommerce.dto.LiteCartDTO;
 import q.bit.qcommerce.dto.ProductDTO;
 import q.bit.qcommerce.model.Cart;
 import q.bit.qcommerce.model.Product;
@@ -27,6 +29,9 @@ public class CartService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private MapperService mapper;
+
     @Value("${env:test}")
     private String env;
 
@@ -34,12 +39,16 @@ public class CartService {
         return cartRepository.findAll();
     }
 
+    public List<LiteCartDTO> findAllLite() {
+        List<Cart> orders = cartRepository.findAll();
+        return mapper.getMapper().map(orders, new TypeToken<List<LiteCartDTO>>(){}.getType());
+    }
+
 
     public Cart createCart(String email, List<ProductDTO> products) throws Exception {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
-
-
+    
         List<Product> productList = productRepository.findAllById(products.stream().map(ProductDTO::getId).collect(Collectors.toList()));
         double total = productList.stream().mapToDouble(Product::getPrice).sum();
 

@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import q.bit.qcommerce.dto.CatResponseDTO;
+import q.bit.qcommerce.dto.LiteCartDTO;
 import q.bit.qcommerce.dto.ProductDTO;
 import q.bit.qcommerce.dto.Response;
 import q.bit.qcommerce.model.Cart;
@@ -33,6 +34,21 @@ public class CartController {
     public Response getAllCarts() {
         try {
             List<Cart> carts = cartService.findAll();
+
+            if (carts.isEmpty()) {
+                return buildResponse("No orders found", 404, null);
+            }
+
+            return buildResponse("Success", 200, carts);
+        } catch (Exception e) {
+            return buildResponse(e.getMessage(), 500, null);
+        }
+    }
+
+    @GetMapping("/lite")
+    public Response getAllLiteCarts() {
+        try {
+            List<LiteCartDTO> carts = cartService.findAllLite();
 
             if (carts.isEmpty()) {
                 return buildResponse("No orders found", 404, null);
