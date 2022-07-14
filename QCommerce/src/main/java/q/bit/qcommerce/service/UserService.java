@@ -9,8 +9,11 @@ import q.bit.qcommerce.dto.UserDTO;
 import q.bit.qcommerce.model.User;
 import q.bit.qcommerce.repository.UserRepository;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -69,5 +72,17 @@ public class UserService {
 
         dbUser.setBalance(dbUser.getBalance() + amount);
         userRepository.save(dbUser);
+    }
+
+    public void cleanInactiveUsers() {
+        List<User> users = userRepository.findAll();
+        log.info("found this users " + users);
+        users = users.stream().filter(user -> Objects.nonNull(user.getLastAccess())
+                && user.getLastAccess()
+                .getTime() + 86400 < new Date()
+                .getTime())
+                .collect(Collectors.toList());
+        log.info("users to delete" + users);
+        userRepository.deleteAll(users);
     }
 }

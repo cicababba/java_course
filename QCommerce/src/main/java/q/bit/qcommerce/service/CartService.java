@@ -48,7 +48,7 @@ public class CartService {
     public Cart createCart(String email, List<ProductDTO> products) throws Exception {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new Exception("User with email " + email + " does not exist"));
-    
+
         List<Product> productList = productRepository.findAllById(products.stream().map(ProductDTO::getId).collect(Collectors.toList()));
         double total = productList.stream().mapToDouble(Product::getPrice).sum();
 
