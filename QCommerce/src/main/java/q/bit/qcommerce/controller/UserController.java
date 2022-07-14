@@ -1,16 +1,14 @@
 package q.bit.qcommerce.controller;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import q.bit.qcommerce.dto.Response;
 import q.bit.qcommerce.dto.UserDTO;
-import q.bit.qcommerce.model.User;
-import q.bit.qcommerce.repository.UserRepository;
 import q.bit.qcommerce.service.UserService;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static q.bit.qcommerce.shared.Utils.buildResponse;
 
@@ -18,20 +16,25 @@ import static q.bit.qcommerce.shared.Utils.buildResponse;
 @RequestMapping("/user")
 public class UserController {
 
+    private static final Logger log = Logger.getLogger(UserController.class);
+
     @Autowired
     private UserService userService;
 
     @GetMapping
     public Response getAllUsers() {
         try {
+            log.info("getAllUsers -> start");
             List<UserDTO> userDTOs = userService.findAll();
 
             if (userDTOs.isEmpty()) {
+                log.info("getAllUsers -> no user found");
                 return buildResponse("No users found", 404, null);
             }
-
+            log.info("getAllUsers -> success");
             return buildResponse("Success", 200, userDTOs);
         } catch (Exception e) {
+            log.error("getAllUsers -> error", e);
             return buildResponse(e.getMessage(), 500, null);
         }
     }
@@ -40,8 +43,10 @@ public class UserController {
     public Response getByEmail(@PathVariable String email) {
        try {
            UserDTO userDto = userService.findByEmail(email);
+           log.info("getByEmail -> user found " + userDto);
            return buildResponse("Success", 200, userDto);
        } catch (Exception e) {
+           log.info("getByEmail -> exception", e);
            return buildResponse(e.getMessage(), 500, null);
        }
     }

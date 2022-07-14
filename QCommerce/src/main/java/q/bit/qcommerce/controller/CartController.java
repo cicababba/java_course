@@ -1,14 +1,18 @@
 package q.bit.qcommerce.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+import q.bit.qcommerce.dto.CatResponseDTO;
 import q.bit.qcommerce.dto.ProductDTO;
 import q.bit.qcommerce.dto.Response;
 import q.bit.qcommerce.model.Cart;
 import q.bit.qcommerce.service.CartService;
 
 import java.util.List;
+import java.util.Objects;
 
 import static q.bit.qcommerce.shared.Utils.buildResponse;
 
@@ -18,6 +22,12 @@ public class CartController {
 
     @Autowired
     private CartService cartService;
+
+    @Value("${cat.url}")
+    private String catUrl;
+
+    @Value("${env:test}")
+    private String env;
 
     @GetMapping
     public Response getAllCarts() {
@@ -48,9 +58,8 @@ public class CartController {
     }
 
     @PostMapping("/{email}")
-    public Response createCart(@RequestBody List<ProductDTO> products,@PathVariable String email) {
+    public Response createCart(@RequestBody List<ProductDTO> products, @PathVariable String email) {
         try {
-
             Cart cart = cartService.createCart(email, products);
             return buildResponse("Success", 200, cart);
         } catch (Exception e) {
@@ -85,9 +94,14 @@ public class CartController {
     @Transactional(rollbackFor = Exception.class)
     public Response createAndPay(@RequestBody List<ProductDTO> products, @PathVariable String email) throws Exception {
         Cart cart = cartService.createCart(email, products);
-//        Thread.sleep(5000);//todo simula un portale esterno
-//            if(2==2) //todo scommentare per testare il transactional
-//                throw new Exception("Esplosione");
+        if(!"prod".equals(env)) {
+            RestTemplate restTemplate = new RestTemplate();
+            CatResponseDTO catResponseDTO = restTemplate.getForObject(catUrl, CatResponseDTO.class);
+
+            if (Objects.nonNull(catResponseDTO) && catResponseDTO.getLength() < 0) {//esempio di pagamento non valido
+                throw new Exception("Payment failed");
+            }
+        }
         cartService.pay(cart.getId(), email);
         return buildResponse("Success", 200, cart);
     }

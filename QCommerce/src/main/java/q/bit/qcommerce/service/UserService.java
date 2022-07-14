@@ -1,5 +1,6 @@
 package q.bit.qcommerce.service;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import q.bit.qcommerce.dto.UserDTO;
@@ -13,12 +14,16 @@ import java.util.Optional;
 @Service
 public class UserService {
 
+    private static final Logger log = Logger.getLogger(UserService.class);
+
     @Autowired
     private UserRepository userRepository;
+
 
     public List<UserDTO> findAll() {
         List<User> users = userRepository.findAll();
         List<UserDTO> userDTOs = new ArrayList<>();
+        log.debug("searching for all users");
         users.forEach(user -> {
             UserDTO userDTO = new UserDTO();
             userDTO.setName(user.getName());

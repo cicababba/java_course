@@ -18,7 +18,7 @@ public class Cart {
     @Column(name = "cart_id")
     private long id;
 
-    @JsonBackReference
+    @JsonBackReference//evita la circular reference
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
