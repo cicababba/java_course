@@ -2,7 +2,6 @@ package q.bit.qcommerce.controller;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import q.bit.qcommerce.dto.LiteUserDTO;
 import q.bit.qcommerce.dto.Response;
@@ -60,22 +59,6 @@ public class UserController {
             return buildResponse("Success", 200, userDto);
         } catch (Exception e) {
             log.info("getByEmail -> exception", e);
-            return buildResponse(e.getMessage(), 500, null);
-        }
-    }
-
-    @PostMapping
-    public Response createUser(@RequestBody UserDTO user) {
-        try {
-            if (user.getEmail().isBlank() || user.getPassword().isBlank())
-                return buildResponse("Email and password are required", 400, null);
-
-            if(userService.exists(user.getEmail()))
-                return buildResponse("User with email " + user.getEmail() + " already exists", 400, null);
-
-            userService.save(user);
-            return buildResponse("Success", 200, null);
-        } catch (Exception e) {
             return buildResponse(e.getMessage(), 500, null);
         }
     }

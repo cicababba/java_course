@@ -2,6 +2,8 @@ package q.bit.qcommerce.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -12,6 +14,7 @@ import q.bit.qcommerce.dto.Response;
 import q.bit.qcommerce.model.Cart;
 import q.bit.qcommerce.service.CartService;
 
+import java.net.Authenticator;
 import java.util.List;
 import java.util.Objects;
 
@@ -73,10 +76,12 @@ public class CartController {
         }
     }
 
-    @PostMapping("/{email}")
-    public Response createCart(@RequestBody List<ProductDTO> products, @PathVariable String email) {
+    @PostMapping
+    public Response createCart(@RequestBody List<ProductDTO> products) {
         try {
-            Cart cart = cartService.createCart(email, products);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String currentUserEmail = auth.getName();
+            Cart cart = cartService.createCart(currentUserEmail, products);
             return buildResponse("Success", 200, cart);
         } catch (Exception e) {
             return buildResponse(e.getMessage(), 500, null);
