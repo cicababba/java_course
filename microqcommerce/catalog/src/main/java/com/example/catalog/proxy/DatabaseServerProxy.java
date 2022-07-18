@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient(name = "database-service", url = "http://localhost:8100")
 public interface DatabaseServerProxy {
 
-    @GetMapping("/{name}")
+    @GetMapping("/database-service-product/{name}")
     Product getProduct(@PathVariable String name);
 }
